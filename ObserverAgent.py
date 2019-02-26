@@ -14,43 +14,23 @@ class ObserverAgent(object):
 
     def step(self, time_step, actions, feat):
         state = {}
-        state["minimap"] = {
-            time_step.observation["feature_minimap"][0],                        # height_map
-            time_step.observation["feature_minimap"][1],                        # visibility
-            time_step.observation["feature_minimap"][2],                        # creep
-            time_step.observation["feature_minimap"][3],                        # camera
-            time_step.observation["feature_minimap"][4],                        # player id
-            time_step.observation["feature_minimap"][5],                        # player_relative
-            time_step.observation["feature_minimap"][6]                         # selected
-        }
-
-        unit_type = time_step.observation["feature_screen"][6]
-        unit_type_compressed = np.zeros(unit_type.shape, dtype=np.float)
-        for y in range(len(unit_type)):
-            for x in range(len(unit_type[y])):
-                if unit_type[y][x] > 0 and unit_type[y][x] in static_data.UNIT_TYPES:
-                    unit_type_compressed[y][x] = static_data.UNIT_TYPES.index(unit_type[y][x]) / len(static_data.UNIT_TYPES)
-
-        hit_points = time_step.observation["feature_screen"][8]
-        hit_points_logged = np.zeros(hit_points.shape, dtype=np.float)
-        for y in range(len(hit_points)):
-            for x in range(len(hit_points[y])):
-                if hit_points[y][x] > 0:
-                    hit_points_logged[y][x] = math.log(hit_points[y][x]) / 4
+        # state["minimap"] = {
+        #     time_step.observation["feature_minimap"][0],                        # height_map
+        #     time_step.observation["feature_minimap"][1],                        # visibility
+        #     time_step.observation["feature_minimap"][2],                        # creep
+        #     time_step.observation["feature_minimap"][3],                        # camera
+        #     time_step.observation["feature_minimap"][4],                        # player id
+        #     time_step.observation["feature_minimap"][5],                        # player_relative
+        # }
 
         state["screen"] = [
             time_step.observation["feature_screen"][0] / 255,               # height_map
             time_step.observation["feature_screen"][1] / 2,                 # visibility
             time_step.observation["feature_screen"][2],                     # creep
             time_step.observation["feature_screen"][3],                     # power
-            # time_step.observation["screen"][5] == 1.astype(int),  # own_units
-            # time_step.observation["screen"][5] == 3.astype(int),  # neutral_units
-            # time_step.observation["screen"][5] == 4.astype(int),  # enemy_units
-            unit_type_compressed,                                   # unit_type
+            time_step.observation["feature_screen"][6],                     
             time_step.observation["feature_screen"][7],                     # selected
-            hit_points_logged,                                      # hit_points
-            # time_step.observation["feature_screen"][9] / 255,               # energy
-            # time_step.observation["feature_screen"][10] / 255,              # shields
+            time_step.observation["feature_screen"][8],                     
             time_step.observation["feature_screen"][11]                     # unit_density
         ]
 
