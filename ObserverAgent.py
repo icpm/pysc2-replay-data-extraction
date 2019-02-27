@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
+from pysc2.lib import static_data
+from pysc2.lib import actions as sc_action
 import math
 
 import numpy as np
-from pysc2.lib import actions as sc_action
-from pysc2.lib import static_data
+np.set_printoptions(threshold=np.nan)
 
 
 class ObserverAgent(object):
@@ -12,48 +13,34 @@ class ObserverAgent(object):
     def __init__(self):
         self.states = []
 
-    def step(self, time_step, actions, feat):
-        state = {}
-        # state["minimap"] = {
-        #     time_step.observation["feature_minimap"][0],                        # height_map
-        #     time_step.observation["feature_minimap"][1],                        # visibility
-        #     time_step.observation["feature_minimap"][2],                        # creep
-        #     time_step.observation["feature_minimap"][3],                        # camera
-        #     time_step.observation["feature_minimap"][4],                        # player id
-        #     time_step.observation["feature_minimap"][5],                        # player_relative
-        # }
+    def step(self, _step, _actions, feat):
+        state = list()
+        state.append([
+            _step.observation["feature_minimap"][1].tolist(),  # visibility
+            _step.observation["feature_minimap"][2].tolist(),  # creep
+            # player_id
+            _step.observation["feature_minimap"][4].tolist(),
+            # player_relative
+            _step.observation["feature_minimap"][5].tolist(),
+        ])
 
-        state["screen"] = [
-            time_step.observation["feature_screen"][0] / 255,               # height_map
-            time_step.observation["feature_screen"][1] / 2,                 # visibility
-            time_step.observation["feature_screen"][2],                     # creep
-            time_step.observation["feature_screen"][3],                     # power
-            time_step.observation["feature_screen"][6],                     
-            time_step.observation["feature_screen"][7],                     # selected
-            time_step.observation["feature_screen"][8],                     
-            time_step.observation["feature_screen"][11]                     # unit_density
-        ]
+        state.append([
+            _step.observation["feature_screen"][1].tolist(),  # visibility
+            _step.observation["feature_screen"][2].tolist(),  # creep
+            _step.observation["feature_screen"][3].tolist(),  # power
+            _step.observation["feature_screen"][4].tolist(),  # player id
+            # player_relative
+            _step.observation["feature_screen"][5].tolist(),
+            _step.observation["feature_screen"][6].tolist(),  # unit_type
+            # unit_density
+            _step.observation["feature_screen"][11].tolist(),
+        ])
 
-        state["player"] = time_step.observation["player"]
+        state.append(_step.observation["player"])
 
-        state["available_actions"] = np.zeros(len(sc_action.FUNCTIONS))
-        for i in time_step.observation["available_actions"]:
-            state["available_actions"][i] = 1.0
-
-        transformed_actions = []
-        for a in actions:
-            try:
-                pysc2_function_call = feat.reverse_action(a)
-                func_id = pysc2_function_call.function
-                func_args = pysc2_function_call.arguments
-                # if func_name.split('_')[0] in {'Attack', 'Scan', 'Behavior','BorrowUp', 'Effect','Hallucination',\
-                #     'Harvest', 'Hold','Land','Lift', 'Load','Move','Patrol','Rally','Smart','TrainWarp',\
-                #     'UnloadAll', 'UnloadAllAt''Build', 'Train', 'Research', 'Morph', 'Cancel', 'Halt', 'Stop'}:
-                transformed_actions.append([func_id, func_args])
-            except:
-                pass
-
-        state["actions"] = transformed_actions
-        print(state)
+        available_actions = np.zeros(len(sc_action.FUNCTIONS))
+        for i in _step.observation["available_actions"]:
+            available_actions[i] = 1.0
+        state.append(available_actions)
+        state.append(_actions)
         self.states.append(state)
-        print(len(self.states))
