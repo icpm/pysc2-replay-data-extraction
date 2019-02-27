@@ -6,8 +6,9 @@ import os
 import pickle
 
 from absl import app, flags
+from google.protobuf.json_format import MessageToDict
 from pysc2 import run_configs
-from pysc2.env.environment import TimeStep, StepType
+from pysc2.env.environment import StepType, TimeStep
 from pysc2.lib import features, point
 from s2clientprotocol import sc2api_pb2 as sc_pb
 
@@ -119,11 +120,13 @@ class ReplayParser:
         self.save_data()
 
     def save_data(self):
+
         print("Saving data")
         if not os.path.exists("data/"):
             os.mkdir("data/")
-        pickle.dump({"info": self.info, "state": self.agent.states},
-                    open("data/" + self.replay_file_name + ".p", "wb"))
+        saving_data = {"info": MessageToDict(self.info), "state": self.agent.states}
+        pickle.dump(saving_data, open(
+            "data/" + self.replay_file_name + ".json", "wb"))
         print("Data successfully saved")
         self.agent.states = []
         print("Data flushed")
