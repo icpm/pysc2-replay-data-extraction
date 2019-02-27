@@ -43,7 +43,8 @@ class ReplayParser:
         self.info = self.controller.replay_info(replay_data)
 
         if not self._valid_replay(self.info, ping):
-            raise Exception("{} is not a valid replay file!".format(replay_file_path))
+            raise Exception(
+                "{} is not a valid replay file!".format(replay_file_path))
 
         screen_size_px = point.Point(*screen_size_px)
         minimap_size_px = point.Point(*minimap_size_px)
@@ -75,7 +76,6 @@ class ReplayParser:
                 info.base_build != ping.base_build or  # different game version
                 info.game_duration_loops < 1000 or
                 len(info.player_info) != 2):
-            # Probably corrupt, or just not interesting.
             return False
         #   for p in info.player_info:
         #       if p.player_apm < 10 or p.player_mmr < 1000:
@@ -85,7 +85,8 @@ class ReplayParser:
         return True
 
     def start(self):
-        _features = features.features_from_game_info(self.controller.game_info())
+        _features = features.features_from_game_info(
+            self.controller.game_info())
 
         i = 0
         while i < self.info.game_duration_loops:
@@ -121,7 +122,8 @@ class ReplayParser:
         print("Saving data")
         if not os.path.exists("data/"):
             os.mkdir("data/")
-        pickle.dump({"info": self.info, "state": self.agent.states}, open("data/" + self.replay_file_name + ".p", "wb"))
+        pickle.dump({"info": self.info, "state": self.agent.states},
+                    open("data/" + self.replay_file_name + ".p", "wb"))
         print("Data successfully saved")
         self.agent.states = []
         print("Data flushed")
