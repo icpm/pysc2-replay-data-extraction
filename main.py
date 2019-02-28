@@ -14,10 +14,8 @@ from s2clientprotocol import sc2api_pb2 as sc_pb
 
 FLAGS = flags.FLAGS
 flags.DEFINE_string("replays", None, "Path to replay files dir.")
-flags.DEFINE_string("agent", None, "Path to an agent.")
+flags.DEFINE_string("agent", "agent.ObserverAgent", "Path to an agent.")
 flags.mark_flag_as_required("replays")
-flags.mark_flag_as_required("agent")
-
 
 class ReplayParser:
     def __init__(self,
@@ -78,11 +76,6 @@ class ReplayParser:
                 info.game_duration_loops < 1000 or
                 len(info.player_info) != 2):
             return False
-        #   for p in info.player_info:
-        #       if p.player_apm < 10 or p.player_mmr < 1000:
-        #           # Low APM = player just standing around.
-        #           # Low MMR = corrupt replay or player who is weak.
-        #           return False
         return True
 
     def start(self):
@@ -99,7 +92,7 @@ class ReplayParser:
             except:
                 pass
 
-            if obs.player_result:  # Episide over.
+            if obs.player_result:
                 self._state = StepType.LAST
                 discount = 0
             else:
@@ -125,8 +118,9 @@ class ReplayParser:
         if not os.path.exists("data/"):
             os.mkdir("data/")
         saving_data = {"info": MessageToDict(self.info), "state": self.agent.states}
+        print(saving_data['info'])
         pickle.dump(saving_data, open(
-            "data/" + self.replay_file_name + ".json", "wb"))
+            "data/" + self.replay_file_name + ".data", "wb"))
         print("Data successfully saved")
         self.agent.states = []
         print("Data flushed")
@@ -147,11 +141,12 @@ def parse_replay(replay_batch, agent_cls):
 
 
 def main(unused):
-    agent_module, agent_name = FLAGS.agent.rsplit(".", 1)
+    _agent = FLAGS.agent
+    _replays_dir = FLAGS.replays
+    agent_module, agent_name = _agent.rsplit(".", 1)
     agent_cls = getattr(importlib.import_module(agent_module), agent_name)
-
-    replays = glob.glob(FLAGS.replays + '*.SC2Replay')
-
+    
+    replays = glob.glob(_replays_dir + '*.SC2Replay')
     for i in replays:
         _app = ReplayParser(i, agent_cls())
         _app.start()
