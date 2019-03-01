@@ -5,7 +5,7 @@ extract state data from `.SC2Replay` files for machine learning training.
 ## Usage
 
 ```
-$ python run.py --replays ~/StarCraftII/Replays/local
+$ python main.py --replays ~/StarCraftII/Replays/local/ --agent agent.ObserverAgent
 ```
 
 ## Structure

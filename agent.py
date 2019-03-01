@@ -9,7 +9,7 @@ class ObserverAgent(object):
     def __init__(self):
         self.states = []
 
-    def step(self, _step, _actions, feat):
+    def step(self, _step, _actions):
         state = dict()
         state['minimap'] = [
             _step.observation["feature_minimap"][1].tolist(),  # visibility
@@ -28,13 +28,13 @@ class ObserverAgent(object):
             _step.observation["feature_screen"][11].tolist(),  # unit_density
         ]
 
-        state['player'] = _step.observation["player"]
+        state['player'] = _step.observation["player"].tolist()
 
         available_actions = np.zeros(len(sc_action.FUNCTIONS))
         for i in _step.observation["available_actions"]:
             available_actions[i] = 1.0
 
-        state['available_actions'] = available_actions
-        state['actual_actions'] = _actions
+        state['available_actions'] = available_actions.tolist()
+        # state['actual_actions'] = _actions
 
         self.states.append(state)

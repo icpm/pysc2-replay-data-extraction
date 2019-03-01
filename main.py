@@ -14,8 +14,10 @@ from s2clientprotocol import sc2api_pb2 as sc_pb
 
 FLAGS = flags.FLAGS
 flags.DEFINE_string("replays", None, "Path to replay files dir.")
-flags.DEFINE_string("agent", "agent.ObserverAgent", "Path to an agent.")
+flags.DEFINE_string("agent", None, "Path to an agent.")
 flags.mark_flag_as_required("replays")
+flags.mark_flag_as_required("agent")
+
 
 class ReplayParser:
     def __init__(self,
@@ -103,7 +105,7 @@ class ReplayParser:
             step = TimeStep(step_type=self._state, reward=0,
                             discount=discount, observation=agent_obs)
 
-            self.agent.step(step, obs.actions, features)
+            self.agent.step(step, obs.actions)
 
             if obs.player_result:
                 break
