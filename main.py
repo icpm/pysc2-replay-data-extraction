@@ -120,7 +120,6 @@ class ReplayParser:
         if not os.path.exists("data/"):
             os.mkdir("data/")
         saving_data = {"info": MessageToDict(self.info), "state": self.agent.states}
-        print(saving_data['info'])
         pickle.dump(saving_data, open(
             "data/" + self.replay_file_name + ".data", "wb"))
         print("Data successfully saved")
