@@ -7,7 +7,7 @@ extract state data from `.SC2Replay` files for machine learning training.
 extract data:
 
 ```bash
-python main.py --replays ~/StarCraftII/Replays/local/ --agent agent.ObserverAgent (on Linux)
+python -m pysc2.bin.agent --map Simple64 --save_replay True --max_episodes 1 --parallel 8 (on Linux)
 ```
 
 generate replays:
